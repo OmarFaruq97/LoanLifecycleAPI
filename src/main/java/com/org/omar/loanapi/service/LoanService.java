@@ -25,7 +25,7 @@ public class LoanService {
         if (totalPaid == null) totalPaid = 0.0;
 
         Map<String, Object> summary = new HashMap<>();
-        summary.add("loanDetails", loan);
+      //  summary.add("loanDetails", loan);
         summary.put("totalPaid", totalPaid);
         summary.put("remainingBalance", loan.getTotalExpectedAmount() - totalPaid);
         return summary;
