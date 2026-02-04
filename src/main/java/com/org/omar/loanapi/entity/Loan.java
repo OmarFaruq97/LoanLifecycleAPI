@@ -1,13 +1,13 @@
 package com.org.omar.loanapi.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
@@ -16,40 +16,29 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 public class Loan {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+
+    private Long id;
     private String customerName;
     private Double principalAmount;
     private Double interestRate;
     private Integer tenureMonths;
     private Double totalExpectedAmount;
+    private Double emiAmount;
     private String status; // ACTIVE, CLOSED, DEFAULTED
+    @CreatedDate
+    @Column(updatable = false, nullable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDateTime createdDate = LocalDateTime.now();
 
-    /*
-    // Empty constructor (needed by JPA)
-    /*
-    public Loan() {
-    }
-
-    // Constructor with fields
-    public Loan(long id, String customerName, Double principalAmount, Double interestRate, Integer tenureMonths, Double totalExpectedAmount, String status, LocalDateTime createdDate) {
-        this.id = id;
-        this.customerName = customerName;
-        this.principalAmount = principalAmount;
-        this.interestRate = interestRate;
-        this.tenureMonths = tenureMonths;
-        this.totalExpectedAmount = totalExpectedAmount;
-        this.status = status;
-        this.createdDate = createdDate;
-    }
-    */
-
-    // Method to calculate expected total
-    public void calculateExpected(){
-        this.totalExpectedAmount = principalAmount +  (principalAmount * (interestRate / 100));
+    public void calculateLoanTerms(){
+        // total interest = principal * (rate/100)
+        this.totalExpectedAmount = principalAmount + (principalAmount * (interestRate / 100));
+        // EMI = (principal + interest) / tenure
+        this.emiAmount = this.totalExpectedAmount / this.tenureMonths;
     }
 }

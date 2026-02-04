@@ -14,8 +14,11 @@ import java.util.Map;
 @RequestMapping("/loans")
 @CrossOrigin(origins = "*") // Allows React to connect
 public class LoanController {
-    @Autowired private LoanService loanService;
-    @Autowired private LoanRepository loanRepo;
+    @Autowired
+    private LoanService loanService;
+
+    @Autowired
+    private LoanRepository loanRepo;
 
     @PostMapping
     public Loan create(@RequestBody Loan loan) {
@@ -34,5 +37,15 @@ public class LoanController {
     @GetMapping("/{id}/summary")
     public Map<String, Object> getSummary(@PathVariable Long id) {
         return loanService.getSummary(id);
+    }
+
+    @PutMapping("/{id}")
+    public Loan updateLoan(@PathVariable Long id, @RequestBody Loan loanDetails) {
+        Loan loan = loanRepo.findById(id).orElseThrow();
+        loan.setCustomerName(loanDetails.getCustomerName());
+        loan.setStatus(loanDetails.getStatus());
+        // Recalculate if financial terms changed
+        loan.calculateLoanTerms();
+        return loanRepo.save(loan);
     }
 }
