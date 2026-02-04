@@ -1,13 +1,12 @@
 package com.org.omar.loanapi.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
@@ -22,6 +21,10 @@ public class Payment {
     private Long id;
     private Long loanId;
     private Double amountPaid;
-    private LocalDateTime paymentDate = LocalDateTime.now();
+
+    @CreatedDate
+    @Column(updatable = false)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+    private LocalDateTime paymentDate ;
 
 }

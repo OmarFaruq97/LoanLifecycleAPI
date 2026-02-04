@@ -25,13 +25,13 @@ public class PaymentService {
 
         // 3. Calculate total paid so far using your JPQL query
         Double totalPaid = paymentRepo.getTotalPaidByLoanId(loan.getId());
+        if (totalPaid == null) totalPaid = 0.0;
 
         // 4. Business Rule: If total paid >= total expected -> status = CLOSED
         if (totalPaid >= loan.getTotalExpectedAmount()) {
             loan.setStatus("CLOSED");
             loanRepo.save(loan);
         }
-
         return savedPayment;
     }
 }
