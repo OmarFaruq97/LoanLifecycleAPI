@@ -25,17 +25,20 @@ public class LoanService {
     }
 
     public Map<String, Object> getSummary(Long id) {
-        Loan loan = loanRepo.findById(id).orElseThrow();
+        Loan loan = loanRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Loan not found with id:" + id));
 
         Double totalPaid = paymentRepo.getTotalPaidByLoanId(id);
         if (totalPaid == null) totalPaid = 0.0;
 
-        Map<String, Object> summary = new HashMap<>();
-        summary.put("loanDetails", loan);
-        summary.put("totalPaid", totalPaid);
-        summary.put("remainingBalance", loan.getTotalExpectedAmount() - totalPaid);
-        summary.put("status", loan.getStatus());
+        Double remainingBalance = loan.getTotalExpectedAmount() - totalPaid;
 
-        return summary;
+        Map<String, Object> response = new java.util.LinkedHashMap<>();
+        response.put("Total Paid: ",totalPaid);
+        response.put("Remaining Balance:", remainingBalance > 0 ? remainingBalance : 0.0);
+
+        response.put("loanDetails", loan);
+
+        return response;
     }
 }
