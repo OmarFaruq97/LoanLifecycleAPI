@@ -1,5 +1,6 @@
 package com.org.omar.loanapi.service;
 
+import com.org.omar.loanapi.dto.LoanSummaryDTO;
 import com.org.omar.loanapi.entity.Loan;
 import com.org.omar.loanapi.repository.LoanRepository;
 import com.org.omar.loanapi.repository.PaymentRepository;
@@ -24,21 +25,17 @@ public class LoanService {
         return loanRepo.save(loan);
     }
 
-    public Map<String, Object> getSummary(Long id) {
+    public LoanSummaryDTO getSummary(Long id) {
         Loan loan = loanRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Loan not found with id:" + id));
 
         Double totalPaid = paymentRepo.getTotalPaidByLoanId(id);
         if (totalPaid == null) totalPaid = 0.0;
 
-        Double remainingBalance = loan.getTotalExpectedAmount() - totalPaid;
+        double remainingBalance = loan.getTotalExpectedAmount() - totalPaid;
 
-        Map<String, Object> response = new java.util.LinkedHashMap<>();
-        response.put("Total Paid: ",totalPaid);
-        response.put("Remaining Balance:", remainingBalance > 0 ? remainingBalance : 0.0);
-
-        response.put("loanDetails", loan);
-
-        return response;
+        return  new LoanSummaryDTO(
+                totalPaid,remainingBalance,loan
+        );
     }
 }

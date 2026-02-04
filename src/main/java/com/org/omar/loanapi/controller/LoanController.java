@@ -1,5 +1,6 @@
 package com.org.omar.loanapi.controller;
 
+import com.org.omar.loanapi.dto.LoanSummaryDTO;
 import com.org.omar.loanapi.entity.Loan;
 import com.org.omar.loanapi.repository.LoanRepository;
 import com.org.omar.loanapi.service.LoanService;
@@ -35,7 +36,7 @@ public class LoanController {
     }
 
     @GetMapping("/{id}/summary")
-    public Map<String, Object> getSummary(@PathVariable Long id) {
+    public LoanSummaryDTO getSummary(@PathVariable Long id) {
         return loanService.getSummary(id);
     }
 
