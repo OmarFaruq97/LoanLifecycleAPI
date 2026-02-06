@@ -24,6 +24,7 @@ public class LoanController {
         return loanService.createLoan(loan);
     }
 
+    //getList
     @GetMapping
     public Page<Loan> list(@RequestParam(defaultValue = "0") int page,
                            @RequestParam(required = false) String status) {
@@ -33,18 +34,22 @@ public class LoanController {
         return loanRepo.findAll(PageRequest.of(page, 10));
     }
 
+    //getByLoanId
     @GetMapping("/{id}/summary")
     public LoanSummaryDTO getSummary(@PathVariable Long id) {
         return loanService.getSummary(id);
     }
 
+    //updateById
     @PutMapping("/{id}")
     public Loan updateLoan(@PathVariable Long id, @RequestBody Loan loanDetails) {
         Loan loan = loanRepo.findById(id).orElseThrow();
         loan.setCustomerName(loanDetails.getCustomerName());
-        loan.setStatus(loanDetails.getStatus());
+
         // Recalculate if financial terms changed
         loan.calculateLoanTerms();
+        loan.setInterestRate(loanDetails.getInterestRate());
+        loan.setTenureMonths(loanDetails.getTenureMonths());
         return loanRepo.save(loan);
     }
 }

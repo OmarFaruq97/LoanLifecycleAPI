@@ -35,7 +35,7 @@ public class Loan {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDateTime createdDate = LocalDateTime.now();
 
-    public void calculateLoanTerms(){
+    public void calculateLoanTerms() {
         // total interest = principal * (rate/100)
         this.totalExpectedAmount = principalAmount + (principalAmount * (interestRate / 100));
         // EMI = (principal + interest) / tenure
