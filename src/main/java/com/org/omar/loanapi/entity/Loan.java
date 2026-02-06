@@ -20,7 +20,12 @@ import java.time.LocalDateTime;
 public class Loan {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "loan_seq_gen")
+    @SequenceGenerator(
+            name = "loan_seq_gen",
+            sequenceName = "loan_sequence",
+            allocationSize = 1
+    )
 
     private Long id;
     private String customerName;
