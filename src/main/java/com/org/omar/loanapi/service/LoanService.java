@@ -31,8 +31,8 @@ public class LoanService {
 
         double remainingBalance = loan.getTotalExpectedAmount() - totalPaid;
 
-        return  new LoanSummaryDTO(
-                totalPaid,remainingBalance,loan
+        return new LoanSummaryDTO(
+                totalPaid, remainingBalance, loan
         );
     }
 }
