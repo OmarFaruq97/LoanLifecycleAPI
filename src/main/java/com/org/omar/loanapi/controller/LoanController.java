@@ -19,6 +19,7 @@ public class LoanController {
     @Autowired
     private LoanRepository loanRepo;
 
+    //create
     @PostMapping
     public Loan create(@RequestBody Loan loan) {
         return loanService.createLoan(loan);
@@ -34,18 +35,29 @@ public class LoanController {
         return loanRepo.findAll(PageRequest.of(page, 10));
     }
 
+    /*
+    * @GetMapping("/{id}/summary")
+    public LoanSummaryDTO getSummary(@PathVariable Long id) {
+        return loanService.getSummary(id);
+    }*/
+
     //getByLoanId
     @GetMapping("/{id}/summary")
     public LoanSummaryDTO getSummary(@PathVariable Long id) {
         return loanService.getSummary(id);
     }
 
+    /*
+    * @PutMapping("/{id}")
+        public Loan update(@PathVariable Long id, @RequestBody Loan loanDetails) {
+            return loanService.updateLoan(id, loanDetails);
+        }
+        */
     //updateById
     @PutMapping("/{id}")
     public Loan updateLoan(@PathVariable Long id, @RequestBody Loan loanDetails) {
         Loan loan = loanRepo.findById(id).orElseThrow();
         loan.setCustomerName(loanDetails.getCustomerName());
-
         // Recalculate if financial terms changed
         loan.calculateLoanTerms();
         loan.setInterestRate(loanDetails.getInterestRate());
