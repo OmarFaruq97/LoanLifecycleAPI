@@ -1,6 +1,5 @@
 package com.org.omar.loanapi.controller;
 
-
 import com.org.omar.loanapi.entity.Payment;
 import com.org.omar.loanapi.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
