@@ -16,22 +16,39 @@ public class PaymentService {
 
     @Transactional
     public Payment addPayment(Payment payment) {
-        // 1. Save the payment
-        Payment savedPayment = paymentRepo.save(payment);
-
-        // 2. Fetch the associated loan
+        // 1.
         Loan loan = loanRepo.findById(payment.getLoanId())
                 .orElseThrow(() -> new RuntimeException("Loan not found"));
 
-        // 3. Calculate total paid so far using your JPQL query
-        Double totalPaid = paymentRepo.getTotalPaidByLoanId(loan.getId());
-        if (totalPaid == null) totalPaid = 0.0;
+        // 2.
+        Double totalPaidBefore = paymentRepo.getTotalPaidByLoanId(loan.getId());
+        if (totalPaidBefore == null) totalPaidBefore = 0.0;
 
-        // 4. Business Rule: If total paid >= total expected -> status = CLOSED
-        if (totalPaid >= loan.getTotalExpectedAmount()) {
+        // 3.
+        double currentPayment = payment.getAmountPaid();
+
+        // 4.
+        double newTotalPaid = totalPaidBefore + currentPayment;
+
+        // 5.
+        double remainingBalance = loan.getTotalExpectedAmount() - totalPaidBefore;
+
+        // 6.
+        if (currentPayment > (remainingBalance + 0.01)) {
+            throw new RuntimeException("Loan amount exceeds payment amount. Remaining Balance: " + remainingBalance);
+        }
+
+        // 7.
+        Payment savedPayment = paymentRepo.save(payment);
+
+        // 8.
+        double difference = loan.getTotalExpectedAmount() - newTotalPaid;
+
+        if (difference <= 0.01) {
             loan.setStatus("CLOSED");
             loanRepo.save(loan);
         }
+
         return savedPayment;
     }
 }
