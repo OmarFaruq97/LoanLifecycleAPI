@@ -12,38 +12,40 @@ import org.springframework.transaction.annotation.Transactional;
 public class PaymentService {
     @Autowired
     private PaymentRepository paymentRepo;
-    @Autowired private LoanRepository loanRepo;
+    @Autowired
+    private LoanRepository loanRepo;
 
     @Transactional
     public Payment addPayment(Payment payment) {
-        // 1.
+        // 1. Fetch the associated loan from the database
         Loan loan = loanRepo.findById(payment.getLoanId())
                 .orElseThrow(() -> new RuntimeException("Loan not found"));
 
-        // 2.
+        // 2. Retrieve the total amount already paid for this loan
         Double totalPaidBefore = paymentRepo.getTotalPaidByLoanId(loan.getId());
         if (totalPaidBefore == null) totalPaidBefore = 0.0;
 
-        // 3.
+        // 3. Get the amount the user is currently trying to pay
         double currentPayment = payment.getAmountPaid();
 
-        // 4.
+        // 4. Calculate what the new total paid amount will be after this transaction
         double newTotalPaid = totalPaidBefore + currentPayment;
 
-        // 5.
+        // 5. Calculate the remaining balance before this payment is processed
         double remainingBalance = loan.getTotalExpectedAmount() - totalPaidBefore;
 
-        // 6.
+        // 6. Validation: Prevent overpayment.
+        // A small buffer (0.01) is added to handle floating-point precision issues.
         if (currentPayment > (remainingBalance + 0.01)) {
             throw new RuntimeException("Loan amount exceeds payment amount. Remaining Balance: " + remainingBalance);
         }
 
-        // 7.
+        // 7. Save the current payment record to the database
         Payment savedPayment = paymentRepo.save(payment);
 
-        // 8.
+        // 8. Closure Logic: Calculate the difference between Expected Total and New Total Paid
         double difference = loan.getTotalExpectedAmount() - newTotalPaid;
-
+        // If the difference is zero or negligible (<= 0.01), mark the loan as CLOSED
         if (difference <= 0.01) {
             loan.setStatus("CLOSED");
             loanRepo.save(loan);
